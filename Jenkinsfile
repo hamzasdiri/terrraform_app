@@ -46,7 +46,7 @@ pipeline {
             steps {
                 script {
                     bat "docker build -t my-image ."
-                    docker.withRegistry('',DOCKERHUB_CREDENTIALS) {
+                    docker.withRegistry('13646891/terraform',DOCKERHUB_CREDENTIALS) {
                         docker.image("my-image").push()
                     }
                 }
