@@ -47,7 +47,7 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('',DOCKER_PASS) {
-                    docker_image = docker.build("my-image", "-f DockerFile .")
+                    docker_image = docker.build("my-image", "-f Dockerfile .")
                     }
                     docker.withRegistry('',DOCKER_PASS) {
                     docker_image.push("my-image")
