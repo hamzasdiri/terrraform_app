@@ -63,37 +63,17 @@ pipeline {
                 }
         }
 
-        stage('Terraform Init and Apply') {
+        stage('Deploy to Azure App Service') {
             steps {
                 script {
-                    sh 'terraform init -upgrade'
-                    sh 'terraform apply -auto-approve'
-                }
-            }
-        }
-
-        stage('Retrieve VM Information') {
-            steps {
-                script {
-                    vmIP = sh(script: 'terraform output vm_ip', returnStdout: true).trim()
-                    vmUsername = sh(script: 'terraform output vm_username', returnStdout: true).trim()
-                }
-            }
-        }
-
-        stage('Deploy Docker Image to VM') {
-            steps {
-                script {
-                    docker.withRegistry('', DOCKER_PASS) {
-                        dockerImage = docker.build("my-image", "-f DockerFile .")
-                    }
-                    sshagent(['your-ssh-credentials-id']) {
-                        sh "ssh ${vmUsername}@${vmIP} 'docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}'"
-                        sh "docker save -o image.tar my-image"
-                        sh "scp -i /path/to/your/private/key image.tar ${vmUsername}@${vmIP}:/path/on/vm"
-                        sh "ssh ${vmUsername}@${vmIP} 'docker load -i /path/on/vm/image.tar'"
-                        sh "ssh ${vmUsername}@${vmIP} 'docker run -d -p 80:80 my-image'"
-                    }
+                    // Set Azure credentials
+                    
+                        // Initialize Terraform
+                        bat 'terraform init'
+                        
+                        // Apply Terraform configuration, passing the Docker image URL as a variable
+                        bat "terraform apply -auto-approve -var 'docker_image_url=13646891/my-image'"
+                    
                 }
             }
         }
