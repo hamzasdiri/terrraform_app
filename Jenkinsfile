@@ -51,7 +51,6 @@ pipeline {
                     }
                     docker.withRegistry('',DOCKER_PASS) {
                     docker_image.push("my-image")
-                    docker_image.push("latest")
                     }
                 }
             }
