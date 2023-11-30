@@ -37,12 +37,6 @@ pipeline {
             }
         }
         
-        stage('Build') {
-            steps {
-                bat 'npm run build'
-            }
-        }
-        
         stage('Test') {
             steps {
                 echo "No tests"
