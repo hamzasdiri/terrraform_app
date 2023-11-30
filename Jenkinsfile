@@ -8,7 +8,8 @@ pipeline {
     environment {
         APP_NAME = "myShopApp"
         RELEASE = "1.0.0"
-        DOCKERHUB_CREDENTIALS = "dockerhub"
+        DOCKER_USER = "13646891"
+        DOCKER_PASS = "dockerhub"
         IMAGE_NAME = "myShopApp - ${DOCKER_USER}" + "/" + "${APP_NAME}"
         IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
     }
@@ -45,9 +46,12 @@ pipeline {
         stage('Build & Push Docker Image') {
             steps {
                 script {
-                    bat "docker build -t my-image ."
-                    docker.withRegistry('13646891/terraform',DOCKERHUB_CREDENTIALS) {
-                        docker.image("my-image").push()
+                    docker.withRegistry('',DOCKER_PASS) {
+                    docker_image = docker.build("${IMAGE_NAME}", "-f DockerFile .")
+                    }
+                    docker.withRegistry('',DOCKER_PASS) {
+                    docker_image.push("${IMAGE_TAG}")
+                    docker_image.push("latest")
                     }
                 }
             }
