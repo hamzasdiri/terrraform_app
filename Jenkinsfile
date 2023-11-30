@@ -8,8 +8,7 @@ pipeline {
     environment {
         APP_NAME = "myShopApp"
         RELEASE = "1.0.0"
-        DOCKER_USER = "13646891"
-        DOCKER_PASS = "dockerhub"
+        DOCKERHUB_CREDENTIALS = "dockerhub"
         IMAGE_NAME = "myShopApp - ${DOCKER_USER}" + "/" + "${APP_NAME}"
         IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
     }
@@ -46,12 +45,9 @@ pipeline {
         stage('Build & Push Docker Image') {
             steps {
                 script {
-                    docker.withRegistry('',DOCKER_PASS) {
                     docker_image = docker.build("${IMAGE_NAME}", "-f DockerFile .")
-                    }
-                    docker.withRegistry('',DOCKER_PASS) {
-                    docker_image.push("${IMAGE_TAG}")
-                    docker_image.push("latest")
+                    docker.withRegistry('',DOCKERHUB_CREDENTIALS) {
+                        docker.image("${IMAGE_TAG}").push()
                     }
                 }
             }
