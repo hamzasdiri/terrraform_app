@@ -45,9 +45,9 @@ pipeline {
         stage('Build & Push Docker Image') {
             steps {
                 script {
-                    docker_image = docker.build("${IMAGE_NAME}", "-f DockerFile .")
+                    bat "docker build -t my-image ."
                     docker.withRegistry('',DOCKERHUB_CREDENTIALS) {
-                        docker.image("${IMAGE_TAG}").push()
+                        docker.image("my-image").push()
                     }
                 }
             }
