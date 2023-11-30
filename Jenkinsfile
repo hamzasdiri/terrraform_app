@@ -26,7 +26,7 @@ pipeline {
                 checkout([
                     $class: 'GitSCM',
                     branches: [[name: '*/main']],
-                    userRemoteConfigs: [[url: 'https://github.com/hamzasdiri/shop_app']]
+                    userRemoteConfigs: [[url: 'https://github.com/hamzasdiri/terrraform_app']]
                 ])
             }
         }
