@@ -12,6 +12,7 @@ pipeline {
         DOCKER_PASS = "dockerhub"
         IMAGE_NAME = "myShopApp - ${DOCKER_USER}" + "/" + "${APP_NAME}"
         IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
+        imgname = "13646891/my-image"
     }
 
     stages {
@@ -43,17 +44,23 @@ pipeline {
             }
         }
 
-        stage('Build & Push Docker Image') {
-            steps {
+        stage('Building image') {
+            steps{
                 script {
-                    docker.withRegistry('',DOCKER_PASS) {
-                    docker_image = docker.build("my-image", "-f Dockerfile .")
-                    }
-                    docker.withRegistry('',DOCKER_PASS) {
-                    docker_image.push("my-image")
-                    }
+                    dockerImage = docker.build imgname
                 }
             }
+        }
+
+        stage('Deploy Image to Dockerhub') {
+            steps{
+                script {
+                    docker.withRegistry( '', registryCredential ) {
+                        dockerImage.push("$BUILD_NUMBER")
+                        dockerImage.push('latest')
+                    }
+                    }
+                }
         }
 
         stage('Terraform Init and Apply') {
@@ -78,14 +85,14 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('', DOCKER_PASS) {
-                        dockerImage = docker.build("${IMAGE_NAME}", "-f DockerFile .")
+                        dockerImage = docker.build("my-image", "-f DockerFile .")
                     }
                     sshagent(['your-ssh-credentials-id']) {
                         sh "ssh ${vmUsername}@${vmIP} 'docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}'"
-                        sh "docker save -o image.tar ${IMAGE_NAME}:${IMAGE_TAG}"
+                        sh "docker save -o image.tar my-image"
                         sh "scp -i /path/to/your/private/key image.tar ${vmUsername}@${vmIP}:/path/on/vm"
                         sh "ssh ${vmUsername}@${vmIP} 'docker load -i /path/on/vm/image.tar'"
-                        sh "ssh ${vmUsername}@${vmIP} 'docker run -d -p 80:80 ${IMAGE_NAME}:${IMAGE_TAG}'"
+                        sh "ssh ${vmUsername}@${vmIP} 'docker run -d -p 80:80 my-image'"
                     }
                 }
             }
